@@ -703,23 +703,27 @@ const sv=()=>{mem=S;try{localStorage.setItem('toeic1',JSON.stringify(S))}catch(e
 let S=ld();S.b=S.b||{};S.nx=S.nx||{};S.log=S.log||{};S.streak=S.streak||0;S.last=S.last||0;
 const dn=()=>{const d=new Date();return Math.floor((d.getTime()-d.getTimezoneOffset()*6e4)/864e5)};
 const $=s=>document.querySelector(s);
+let cn=0,wait={};
 let tab='card',cur=null,flip=false,prev=-1,q=null,qs=null;
 
 function mark(id,ok){
   const t=dn();
-  S.b[id]=ok?Math.min(5,(S.b[id]||0)+1):1;
+  S.b[id]=ok?(S.b[id]===undefined?2:Math.min(5,S.b[id]+1)):1;
+  cn++;if(ok)delete wait[id];else wait[id]=cn+5+Math.floor(Math.random()*4);
   S.nx[id]=t+(ok?DAYS[S.b[id]]:0);
   S.log[t]=(S.log[t]||0)+1;
   if(S.last!==t){S.streak=(S.last===t-1)?S.streak+1:1;S.last=t}
   sv();
 }
 function pick(){
-  const t=dn(),ids=W.map((_,i)=>i).filter(i=>i!==prev);
+  const t=dn(),all=W.map((_,i)=>i).filter(i=>i!==prev);
+  const ids=all.filter(i=>!(wait[i]>cn));
   const due=ids.filter(i=>S.b[i]!==undefined&&S.nx[i]<=t);
   if(due.length)return due[Math.floor(Math.random()*due.length)];
   const nw=ids.filter(i=>S.b[i]===undefined);
   if(nw.length)return nw[0];
-  ids.sort((a,b)=>S.b[a]-S.b[b]);return ids[0];
+  if(ids.length){ids.sort((a,b)=>S.b[a]-S.b[b]);return ids[0]}
+  all.sort((a,b)=>(wait[a]||0)-(wait[b]||0));return all[0];
 }
 function say(i){
   try{const u=new SpeechSynthesisUtterance(W[i][0]);u.lang='en-US';u.rate=.85;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}
