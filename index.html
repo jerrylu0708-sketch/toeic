@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>多益單字</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="多益單字">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#14213d">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+:root{--bg:#f3f1ec;--card:#fff;--ink:#14213d;--mute:#6b7385;--line:#d9d6cd;--acc:#14213d;--onacc:#fff;--hi:#f2a900;--ok:#1f8a5b;--bad:#c4412f;--okbg:#dff3e8;--badbg:#f8e0db;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#10151f;--card:#1b2333;--ink:#eef0f5;--mute:#98a1b5;--line:#2c364b;--acc:#f2a900;--onacc:#14213d;--okbg:#17372b;--badbg:#42221d;--ok:#59d19a;--bad:#ff8a77}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,"PingFang TC","Noto Sans TC",sans-serif;display:flex;flex-direction:column;overflow:hidden}
+main{flex:1;overflow-y:auto;padding:20px 18px 12px;max-width:560px;width:100%;margin:0 auto}
+nav{display:flex;border-top:1px solid var(--line);background:var(--card);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;border:0;background:none;padding:12px 0 10px;font-size:14px;color:var(--mute);font-family:inherit}
+nav button.on{color:var(--ink);font-weight:700;box-shadow:inset 0 3px 0 var(--hi)}
+.top{display:flex;justify-content:space-between;color:var(--mute);font-size:14px;margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;min-height:340px;padding:26px 22px;display:flex;flex-direction:column;justify-content:center;text-align:center;cursor:pointer}
+.en{font:700 40px/1.15 Georgia,"Times New Roman",serif;margin:0 0 6px;word-break:break-word}
+.pos{color:var(--mute);font-style:italic;font-family:Georgia,serif}
+.zh{font-size:30px;font-weight:700;margin:6px 0 16px}
+.ex{font-family:Georgia,serif;font-size:17px;margin:0;text-align:left;border-left:3px solid var(--hi);padding-left:12px}
+.exz{color:var(--mute);font-size:14px;margin:4px 0 0;text-align:left;padding-left:15px}
+.hint{color:var(--mute);font-size:14px;margin-top:22px}
+.row{display:flex;gap:10px;margin-top:14px}
+.btn{flex:1;border:0;border-radius:14px;padding:16px;font-size:17px;font-weight:700;font-family:inherit;background:var(--acc);color:var(--onacc)}
+.btn.alt{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn.sm{flex:none;padding:8px 16px;font-size:15px;margin-top:10px;align-self:center}
+h2{font-size:22px;margin:4px 0 14px}
+.q{font:700 34px/1.2 Georgia,serif;text-align:center;margin:18px 0 6px}
+.opt{display:block;width:100%;text-align:left;margin-top:10px;padding:15px 16px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:18px;font-family:inherit}
+.opt.ok{background:var(--okbg);border-color:var(--ok)}
+.opt.bad{background:var(--badbg);border-color:var(--bad)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.stat b{display:block;font:700 34px/1.1 Georgia,serif}
+.stat span{color:var(--mute);font-size:14px}
+.bar{height:12px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0 4px}
+.bar i{display:block;height:100%;background:var(--hi)}
+.boxes{display:flex;gap:6px;margin-top:8px}
+.boxes div{flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 0;text-align:center;font-size:13px;color:var(--mute)}
+.boxes b{display:block;font-size:20px;color:var(--ink)}
+.link{background:none;border:0;color:var(--mute);text-decoration:underline;font-size:14px;margin-top:22px;font-family:inherit}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<nav>
+<button data-t="card" class="on">單字卡</button>
+<button data-t="quiz">測驗</button>
+<button data-t="stat">進度</button>
+</nav>
+<script>
+const W=[
+["agenda","n.","議程","Please review the agenda before the meeting.","請在會議前先看一下議程。"],
+["deadline","n.","截止期限","The deadline for the report is Friday.","報告的截止日是星期五。"],
+["invoice","n.","發票；請款單","We will send you an invoice next week.","我們下週會寄請款單給您。"],
+["budget","n.","預算","The marketing budget was reduced this year.","今年的行銷預算被縮減了。"],
+["colleague","n.","同事","My colleague will cover my shift.","我的同事會代我的班。"],
+["supervisor","n.","主管","Ask your supervisor for approval.","請向你的主管申請核准。"],
+["candidate","n.","應徵者；候選人","Each candidate will have an interview.","每位應徵者都會有面試。"],
+["resume","n.","履歷","Please attach your resume to the email.","請把履歷附在電子郵件中。"],
+["salary","n.","薪水","The salary depends on experience.","薪水視經驗而定。"],
+["promote","v.","升遷；推廣","She was promoted to manager last month.","她上個月升為經理。"],
+["reimburse","v.","報銷；補償","The company will reimburse your travel costs.","公司會報銷你的差旅費。"],
+["expense","n.","開銷；費用","Keep receipts for all business expenses.","所有商務開銷都要留收據。"],
+["revenue","n.","營收","Revenue increased by ten percent.","營收成長了百分之十。"],
+["profit","n.","利潤","The firm made a small profit this quarter.","公司本季獲利不多。"],
+["purchase","v.","購買","You can purchase tickets online.","你可以在線上購票。"],
+["supplier","n.","供應商","We changed our main supplier last year.","我們去年換了主要供應商。"],
+["shipment","n.","出貨；貨物","The shipment arrived two days late.","貨物晚了兩天到。"],
+["deliver","v.","遞送","They deliver within 24 hours.","他們在二十四小時內送達。"],
+["warehouse","n.","倉庫","The goods are stored in a warehouse.","貨物存放在倉庫裡。"],
+["inventory","n.","庫存","We need to check the inventory every month.","我們每個月都要清點庫存。"],
+["delay","n./v.","延誤；延遲","The flight delay caused a missed meeting.","班機延誤導致錯過會議。"],
+["reschedule","v.","重新安排時間","Can we reschedule the call for Monday?","我們可以把電話會議改到週一嗎？"],
+["postpone","v.","延期","The event was postponed due to rain.","活動因下雨而延期。"],
+["attend","v.","出席；參加","All staff must attend the training.","所有員工都必須參加訓練。"],
+["conference","n.","大型會議","She will speak at the conference.","她將在研討會上演講。"],
+["participant","n.","參加者","Each participant received a name tag.","每位參加者都拿到名牌。"],
+["reservation","n.","預約；訂位","I would like to make a reservation.","我想要訂位。"],
+["itinerary","n.","行程表","Here is your travel itinerary.","這是您的旅行行程表。"],
+["baggage","n.","行李","Baggage must be checked at the counter.","行李必須在櫃檯託運。"],
+["departure","n.","出發；起飛","Departure is scheduled for 9 a.m.","預定上午九點出發。"],
+["refund","n./v.","退款","You may request a full refund.","您可以申請全額退款。"],
+["warranty","n.","保固","The laptop comes with a two-year warranty.","這台筆電有兩年保固。"],
+["complaint","n.","客訴；抱怨","We received a complaint about the service.","我們收到一則服務客訴。"],
+["inquiry","n.","詢問","Thank you for your inquiry.","謝謝您的詢問。"],
+["attach","v.","附上；附加","I have attached the file for your review.","我已附上檔案供您檢閱。"],
+["recipient","n.","收件人","The recipient must sign for the package.","收件人必須簽收包裹。"],
+["proposal","n.","提案","The board accepted our proposal.","董事會接受了我們的提案。"],
+["contract","n.","合約","Both parties signed the contract.","雙方都簽了合約。"],
+["negotiate","v.","協商；談判","We will negotiate the price tomorrow.","我們明天會協商價格。"],
+["agreement","n.","協議","They reached an agreement on the terms.","他們就條款達成協議。"],
+["policy","n.","政策；規定","Company policy does not allow this.","公司規定不允許這樣做。"],
+["regulation","n.","法規","New safety regulations take effect in May.","新的安全法規在五月生效。"],
+["require","v.","需要；要求","This job requires two years of experience.","這份工作需要兩年經驗。"],
+["submit","v.","提交","Submit the form by noon.","請在中午前提交表格。"],
+["approve","v.","核准","The manager approved the request.","經理核准了這項申請。"],
+["appointment","n.","約定；預約","I have a dentist appointment at three.","我三點有牙醫的預約。"],
+["available","adj.","有空的；可取得的","Is Ms. Lin available this afternoon?","林小姐今天下午有空嗎？"],
+["install","v.","安裝","A technician will install the software.","技術人員會安裝軟體。"],
+["maintenance","n.","維修；保養","The system is down for maintenance.","系統因維修而暫停。"],
+["renovation","n.","整修","The lobby is closed for renovation.","大廳因整修而關閉。"],
+["facility","n.","設施","The new facility opens next spring.","新設施明年春天啟用。"],
+["equipment","n.","設備","All equipment must be returned.","所有設備都必須歸還。"],
+["launch","v./n.","推出；發表","The company will launch a new product.","公司將推出新產品。"],
+["campaign","n.","活動；宣傳","The ad campaign boosted sales.","廣告活動提升了銷售。"],
+["discount","n.","折扣","Members get a ten percent discount.","會員享有九折優惠。"],
+["survey","n.","問卷；調查","Please complete the customer survey.","請填寫顧客問卷。"],
+["estimate","n./v.","估價；估計","Can you give me an estimate for the repair?","你可以給我維修的估價嗎？"],
+["qualified","adj.","合格的","She is qualified for the position.","她符合這個職位的資格。"],
+["mandatory","adj.","強制的","Attendance is mandatory.","出席是強制的。"],
+["expire","v.","到期","Your membership will expire in June.","您的會員資格六月到期。"],
+["urgent","adj.","緊急的","This is an urgent matter.","這是緊急的事。"],
+["manufacturer","n.","製造商","The manufacturer offers free repairs.","製造商提供免費維修。"]
+];
+const R=`
+accommodate|v.|容納；提供住宿
+accountant|n.|會計師
+accurate|adj.|準確的
+achieve|v.|達成
+acquire|v.|取得；收購
+adjust|v.|調整
+administration|n.|行政管理
+advantage|n.|優勢
+advise|v.|建議；告知
+affect|v.|影響
+afford|v.|負擔得起
+alternative|n.|替代方案
+announce|v.|宣布
+annual|adj.|每年的
+applicant|n.|申請人
+application|n.|申請書；應用程式
+appreciate|v.|感激
+arrange|v.|安排
+assign|v.|指派
+assist|v.|協助
+assistant|n.|助理
+associate|n.|同事；夥伴
+assume|v.|假定
+attendance|n.|出席
+authorize|v.|授權
+automatic|adj.|自動的
+award|n.|獎項
+aware|adj.|知道的
+branch|n.|分公司；分支
+brochure|n.|宣傳手冊
+cancel|v.|取消
+capacity|n.|容量；產能
+cashier|n.|收銀員
+catalog|n.|型錄
+celebrate|v.|慶祝
+certificate|n.|證書
+charge|n.|費用；收費
+clarify|v.|釐清
+client|n.|客戶
+collaborate|v.|合作共事
+commute|v.|通勤
+compensation|n.|補償；薪酬
+competitor|n.|競爭對手
+complete|v.|完成
+comply|v.|遵守
+concern|n.|擔憂；關切
+conduct|v.|執行；進行
+confirm|v.|確認
+consider|v.|考慮
+consult|v.|諮詢
+consumer|n.|消費者
+contact|v.|聯絡
+corporate|adj.|公司的
+cooperate|v.|配合
+coordinate|v.|協調
+correspondence|n.|信件往來
+cover|v.|涵蓋；負擔
+critical|adj.|關鍵的
+currently|adv.|目前
+dedicated|adj.|專注投入的
+demonstrate|v.|示範；證明
+department|n.|部門
+depend|v.|取決於
+describe|v.|描述
+designate|v.|指定
+detail|n.|細節
+determine|v.|決定
+develop|v.|開發；發展
+director|n.|主任；董事
+disclose|v.|揭露
+discuss|v.|討論
+display|v.|展示
+distribute|v.|分發
+document|n.|文件
+donate|v.|捐贈
+draft|n.|草稿
+efficient|adj.|有效率的
+eligible|adj.|符合資格的
+employee|n.|員工
+employer|n.|雇主
+enclose|v.|隨函附上
+encourage|v.|鼓勵
+enroll|v.|註冊
+ensure|v.|確保
+entrance|n.|入口
+environment|n.|環境
+evaluate|v.|評估
+evidence|n.|證據
+exceed|v.|超過
+executive|n.|高階主管
+exhibit|n.|展覽品
+experience|n.|經驗
+expert|n.|專家
+extend|v.|延長；延伸
+extension|n.|分機；延期
+fee|n.|費用
+feedback|n.|意見回饋
+fiscal|adj.|財政的
+fluctuate|v.|波動
+forecast|n.|預測
+formal|adj.|正式的
+found|v.|創立
+furniture|n.|家具
+generate|v.|產生
+graduate|v.|畢業
+grant|n.|補助金
+guarantee|v.|保證
+guideline|n.|準則
+headquarters|n.|總部
+hire|v.|僱用
+identify|v.|辨識
+implement|v.|實施
+improve|v.|改善
+incentive|n.|獎勵措施
+include|v.|包含
+income|n.|收入
+increase|v.|增加
+indicate|v.|指出
+individual|n.|個人
+industry|n.|產業
+influence|n.|影響力
+inform|v.|告知
+initial|adj.|最初的
+innovation|n.|創新
+inspect|v.|檢查
+inspector|n.|檢查員
+instruct|v.|指導
+instruction|n.|說明；指示
+insurance|n.|保險
+intend|v.|打算
+interest|n.|利息；興趣
+internal|adj.|內部的
+introduce|v.|介紹
+investment|n.|投資
+involve|v.|涉及
+issue|n.|議題；發行
+junior|adj.|資淺的
+lease|n.|租約
+leave|n.|休假
+lecture|n.|演講；講課
+liability|n.|責任；負債
+license|n.|執照
+limit|n.|限制
+local|adj.|當地的
+locate|v.|位於；找出
+lobby|n.|大廳
+logistics|n.|物流
+loyal|adj.|忠誠的
+maintain|v.|維持；保養
+major|adj.|主要的
+management|n.|管理階層
+manufacture|v.|製造
+margin|n.|利潤率；邊緣
+market|n.|市場
+material|n.|材料
+measure|n.|措施；測量
+merchandise|n.|商品
+merge|v.|合併
+mention|v.|提到
+minimum|n.|最小值
+minutes|n.|會議紀錄
+modify|v.|修改
+monitor|v.|監控
+notice|n.|通知；公告
+notify|v.|通知
+objective|n.|目標
+obtain|v.|取得
+occupy|v.|佔用
+occur|v.|發生
+offer|v.|提供
+official|adj.|官方的
+operate|v.|營運；操作
+opening|n.|職缺；開幕
+opportunity|n.|機會
+option|n.|選項
+order|n.|訂單；訂購
+organize|v.|組織；籌劃
+outstanding|adj.|傑出的；未付的
+overdue|adj.|逾期的
+overtime|n.|加班
+owner|n.|所有人
+package|n.|包裹
+participate|v.|參與
+partner|n.|合夥人
+patient|n.|病人
+payment|n.|付款
+payroll|n.|薪資單
+perform|v.|執行；表演
+performance|n.|表現；績效
+permit|n.|許可證
+personnel|n.|人事；員工
+persuade|v.|說服
+position|n.|職位
+potential|adj.|潛在的
+predict|v.|預測
+preference|n.|偏好
+premium|n.|保費；優質的
+prepare|v.|準備
+presentation|n.|簡報
+preserve|v.|保存
+previous|adj.|先前的
+priority|n.|優先事項
+procedure|n.|程序
+process|n.|流程
+produce|v.|生產
+product|n.|產品
+productivity|n.|生產力
+professional|adj.|專業的
+profitable|adj.|有利潤的
+progress|n.|進展
+prohibit|v.|禁止
+project|n.|專案
+promotion|n.|升遷；促銷
+prompt|adj.|迅速的
+property|n.|財產；房地產
+provide|v.|提供
+publish|v.|出版
+punctual|adj.|準時的
+quality|n.|品質
+quantity|n.|數量
+quarter|n.|季度
+questionnaire|n.|問卷
+quote|n.|報價
+rate|n.|費率；比率
+receipt|n.|收據
+receive|v.|收到
+reception|n.|接待處；歡迎會
+receptionist|n.|櫃檯人員
+recommend|v.|推薦
+record|n.|紀錄
+recruit|v.|招募
+reduce|v.|減少
+refer|v.|參考；轉介
+reference|n.|推薦人；參考
+reflect|v.|反映
+register|v.|登記
+registration|n.|報名
+regular|adj.|定期的
+reject|v.|拒絕
+related|adj.|相關的
+release|v.|發布；釋出
+reliable|adj.|可靠的
+relocate|v.|搬遷
+remain|v.|仍然；保持
+remind|v.|提醒
+remote|adj.|遠端的
+renew|v.|更新；續約
+rental|n.|租賃
+repair|v.|修理
+replace|v.|取代
+represent|v.|代表
+representative|n.|代表人員
+reputation|n.|名聲
+requirement|n.|要求；條件
+research|n.|研究
+reserve|v.|預訂
+resign|v.|辭職
+resolve|v.|解決
+resource|n.|資源
+respond|v.|回應
+response|n.|回覆
+responsible|adj.|負責的
+restrict|v.|限制
+result|n.|結果
+retail|n.|零售
+retire|v.|退休
+review|v.|審閱
+revise|v.|修訂
+reward|n.|獎賞
+routine|n.|例行公事
+sample|n.|樣品
+satisfy|v.|使滿意
+security|n.|安全；保全
+select|v.|挑選
+seminar|n.|研討會
+senior|adj.|資深的
+separate|adj.|分開的
+session|n.|時段；場次
+settle|v.|解決；安頓
+shift|n.|輪班
+shortage|n.|短缺
+signature|n.|簽名
+significant|adj.|重大的
+similar|adj.|類似的
+solution|n.|解決方案
+specific|adj.|特定的
+specify|v.|明確指出
+staff|n.|員工
+standard|n.|標準
+statement|n.|聲明；對帳單
+status|n.|狀態
+storage|n.|儲存
+strategy|n.|策略
+subscribe|v.|訂閱
+subscription|n.|訂閱服務
+substitute|n.|替代者
+sufficient|adj.|足夠的
+suggest|v.|建議
+suitable|adj.|合適的
+summary|n.|摘要
+supervise|v.|督導
+supply|n.|供應
+support|v.|支持
+surplus|n.|盈餘
+suspend|v.|暫停
+tax|n.|稅
+technician|n.|技術人員
+temporary|adj.|暫時的
+tenant|n.|房客
+term|n.|條款；期間
+terminate|v.|終止
+tight|adj.|緊的
+tourism|n.|觀光
+trade|n.|貿易
+trainee|n.|受訓者
+training|n.|訓練
+transaction|n.|交易
+transfer|v.|調動；轉帳
+transport|v.|運輸
+tuition|n.|學費
+turnover|n.|營業額；離職率
+unavailable|adj.|無法取得的
+update|v.|更新
+upgrade|v.|升級
+usage|n.|使用量
+utility|n.|公用事業
+valid|adj.|有效的
+valuable|adj.|貴重的
+vacancy|n.|空缺
+vendor|n.|廠商；小販
+venue|n.|場地
+verify|v.|核實
+version|n.|版本
+volunteer|n.|志工
+voucher|n.|優惠券
+wage|n.|工資
+waive|v.|豁免
+withdraw|v.|提領；撤回
+workshop|n.|工作坊
+airline|n.|航空公司
+aisle|n.|走道
+arrival|n.|抵達
+boarding|n.|登機
+cabin|n.|機艙
+customs|n.|海關
+destination|n.|目的地
+domestic|adj.|國內的
+fare|n.|票價
+flight|n.|航班
+gate|n.|登機門
+journey|n.|旅程
+lodging|n.|住宿
+luggage|n.|行李
+passenger|n.|乘客
+passport|n.|護照
+platform|n.|月台；平台
+tourist|n.|遊客
+vehicle|n.|車輛
+beverage|n.|飲料
+cuisine|n.|料理
+catering|n.|外燴
+chef|n.|主廚
+ingredient|n.|食材
+menu|n.|菜單
+tip|n.|小費
+cafeteria|n.|自助餐廳
+banquet|n.|宴會
+approximately|adv.|大約
+consequently|adv.|因此
+considerably|adv.|相當地
+eventually|adv.|最終
+previously|adv.|先前
+promptly|adv.|迅速地
+recently|adv.|最近
+regarding|prep.|關於
+despite|prep.|儘管
+throughout|prep.|遍及
+unless|conj.|除非
+whereas|conj.|然而
+within|prep.|在…之內
+instead|adv.|反而
+otherwise|adv.|否則
+nevertheless|adv.|儘管如此
+thoroughly|adv.|徹底地
+relatively|adv.|相對地
+primarily|adv.|主要地
+temporarily|adv.|暫時地
+immediately|adv.|立即
+extremely|adv.|極度地
+substantially|adv.|大幅地
+exclusively|adv.|專門地
+originally|adv.|原本
+briefly|adv.|簡短地
+shortly|adv.|不久
+frequently|adv.|經常
+automatically|adv.|自動地
+cabinet|n.|櫃子
+copier|n.|影印機
+cartridge|n.|墨水匣
+device|n.|裝置
+download|v.|下載
+file|n.|檔案
+network|n.|網路
+password|n.|密碼
+printer|n.|印表機
+projector|n.|投影機
+software|n.|軟體
+stationery|n.|文具
+supplies|n.|用品
+upload|v.|上傳
+backup|n.|備份
+malfunction|n.|故障
+outage|n.|停電；停機
+battery|n.|電池
+apartment|n.|公寓
+architect|n.|建築師
+construction|n.|建設
+contractor|n.|承包商
+elevator|n.|電梯
+estate|n.|房地產
+landlord|n.|房東
+parking|n.|停車
+premises|n.|營業場所
+residential|adj.|住宅的
+asset|n.|資產
+balance|n.|餘額
+bankruptcy|n.|破產
+bond|n.|債券
+borrow|v.|借入
+capital|n.|資本
+cash|n.|現金
+credit|n.|信用
+debt|n.|債務
+deposit|n.|存款；訂金
+dividend|n.|股利
+earnings|n.|收益
+finance|n.|財務
+fund|n.|基金
+loan|n.|貸款
+mortgage|n.|房貸
+penalty|n.|罰款
+pension|n.|退休金
+shareholder|n.|股東
+stock|n.|股票；存貨
+subsidy|n.|補貼
+tariff|n.|關稅
+wealth|n.|財富
+clinic|n.|診所
+dentist|n.|牙醫
+pharmacy|n.|藥局
+prescription|n.|處方箋
+symptom|n.|症狀
+physician|n.|醫師
+medical|adj.|醫療的
+nutrition|n.|營養
+audience|n.|觀眾；受眾
+brand|n.|品牌
+commercial|adj.|商業的
+demand|n.|需求
+distribution|n.|分銷
+endorse|v.|代言；背書
+exhibition|n.|展覽
+feature|n.|特色
+trend|n.|趨勢
+target|n.|目標對象
+slogan|n.|標語
+sponsor|n.|贊助者
+publicity|n.|宣傳
+promotional|adj.|促銷的
+expand|v.|擴張
+competitive|adj.|有競爭力的
+apologize|v.|道歉
+attract|v.|吸引
+beneficial|adj.|有益的
+bulk|n.|大量
+cease|v.|停止
+chairperson|n.|主席
+commitment|n.|承諾
+compile|v.|彙編
+component|n.|零件
+comprehensive|adj.|全面的
+conclude|v.|結束；下結論
+condition|n.|條件；狀況
+confidential|adj.|機密的
+consistent|adj.|一致的
+convenience|n.|便利
+convince|v.|使確信
+cost|n.|成本
+courier|n.|快遞員
+damage|n.|損壞
+decline|v.|婉拒；下降
+defect|n.|瑕疵
+delegate|v.|委派
+diversity|n.|多元性
+duration|n.|期間
+duty|n.|職責；關稅
+emphasize|v.|強調
+enhance|v.|增強
+enthusiastic|adj.|熱情的
+establish|v.|建立
+exception|n.|例外
+exclude|v.|排除
+expertise|n.|專業知識
+fabric|n.|布料
+fault|n.|過錯
+fragile|adj.|易碎的
+function|n.|功能
+gather|v.|聚集；蒐集
+generous|adj.|慷慨的
+handle|v.|處理
+hazard|n.|危險
+inconvenience|n.|不便
+infrastructure|n.|基礎建設
+inspection|n.|檢查作業
+intern|n.|實習生
+interrupt|v.|打斷
+inquire|v.|詢問
+label|n.|標籤
+lack|n.|缺乏
+layoff|n.|裁員
+leaflet|n.|傳單
+likely|adj.|可能的
+manual|n.|手冊
+mutual|adj.|互相的
+nominate|v.|提名
+obligation|n.|義務
+obsolete|adj.|過時的
+orientation|n.|新人訓練
+oversee|v.|監管
+pamphlet|n.|小冊子
+patent|n.|專利
+precaution|n.|預防措施
+prestigious|adj.|有聲望的
+prior|adj.|先前的
+privacy|n.|隱私
+proficiency|n.|熟練度
+proof|n.|證明
+refreshments|n.|茶點
+refrain|v.|避免
+relevant|adj.|相關的
+reliability|n.|可靠性
+remainder|n.|剩餘
+reminder|n.|提醒
+renowned|adj.|著名的
+retain|v.|保留
+retrieve|v.|取回
+safety|n.|安全
+sector|n.|產業部門
+shelf|n.|架子
+simplify|v.|簡化
+spacious|adj.|寬敞的
+stable|adj.|穩定的
+strict|adj.|嚴格的
+subtotal|n.|小計
+superior|adj.|優越的
+supplement|n.|補充品
+sustainable|adj.|永續的
+tentative|adj.|暫定的
+transit|n.|運輸；過境
+tremendous|adj.|巨大的
+undergo|v.|經歷
+undertake|v.|承擔
+unexpected|adj.|意外的
+unique|adj.|獨特的
+utilize|v.|利用
+variety|n.|多樣
+via|prep.|經由
+visible|adj.|可見的
+vital|adj.|至關重要的
+warn|v.|警告
+workforce|n.|勞動力
+`;
+R.trim().split("\n").forEach(l=>{const a=l.split("|");W.push([a[0],a[1],a[2],"",""])});
+const DAYS=[0,0,1,3,7,14];
+let mem={};
+const ld=()=>{try{return JSON.parse(localStorage.getItem('toeic1'))||mem}catch(e){return mem}};
+const sv=()=>{mem=S;try{localStorage.setItem('toeic1',JSON.stringify(S))}catch(e){}};
+let S=ld();S.b=S.b||{};S.nx=S.nx||{};S.log=S.log||{};S.streak=S.streak||0;S.last=S.last||0;
+const dn=()=>{const d=new Date();return Math.floor((d.getTime()-d.getTimezoneOffset()*6e4)/864e5)};
+const $=s=>document.querySelector(s);
+let tab='card',cur=null,flip=false,prev=-1,q=null,qs=null;
+
+function mark(id,ok){
+  const t=dn();
+  S.b[id]=ok?Math.min(5,(S.b[id]||0)+1):1;
+  S.nx[id]=t+(ok?DAYS[S.b[id]]:0);
+  S.log[t]=(S.log[t]||0)+1;
+  if(S.last!==t){S.streak=(S.last===t-1)?S.streak+1:1;S.last=t}
+  sv();
+}
+function pick(){
+  const t=dn(),ids=W.map((_,i)=>i).filter(i=>i!==prev);
+  const due=ids.filter(i=>S.b[i]!==undefined&&S.nx[i]<=t);
+  if(due.length)return due[Math.floor(Math.random()*due.length)];
+  const nw=ids.filter(i=>S.b[i]===undefined);
+  if(nw.length)return nw[0];
+  ids.sort((a,b)=>S.b[a]-S.b[b]);return ids[0];
+}
+function say(i){
+  try{const u=new SpeechSynthesisUtterance(W[i][0]);u.lang='en-US';u.rate=.85;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}
+}
+function card(){
+  if(cur===null)cur=pick();
+  const w=W[cur],t=dn(),n=Object.keys(S.b).length;
+  const due=W.filter((_,i)=>S.b[i]!==undefined&&S.nx[i]<=t).length;
+  $('#app').innerHTML=`<div class="top"><span>今天已學 ${S.log[t]||0} 次</span><span>待複習 ${due}・新字 ${W.length-n}</span></div>
+  <div class="card" id="c">${flip?
+   `<div class="en">${w[0]}</div><div class="pos">${w[1]}</div><div class="zh">${w[2]}</div>${w[3]?`<p class="ex">${w[3]}</p><p class="exz">${w[4]}</p>`:''}`:
+   `<div class="en">${w[0]}</div><div class="pos">${w[1]}</div><div class="hint">點一下看意思</div>`}
+   <button class="btn alt sm" id="sp">發音</button></div>
+  ${flip?`<div class="row"><button class="btn alt" id="no">不熟</button><button class="btn" id="yes">會了</button></div>`:`<div class="row"><button class="btn" id="show">顯示答案</button></div>`}`;
+  $('#c').onclick=e=>{if(e.target.id==='sp'){say(cur);return}flip=true;card()};
+  if($('#show'))$('#show').onclick=()=>{flip=true;card()};
+  if($('#yes'))$('#yes').onclick=()=>next(true);
+  if($('#no'))$('#no').onclick=()=>next(false);
+}
+function next(ok){mark(cur,ok);prev=cur;cur=pick();flip=false;card()}
+
+function newQ(){
+  const id=Math.floor(Math.random()*W.length),opts=[id];
+  while(opts.length<4){const r=Math.floor(Math.random()*W.length);if(!opts.includes(r)&&!opts.some(o=>W[o][2]===W[r][2]))opts.push(r)}
+  opts.sort(()=>Math.random()-.5);return{id,opts,done:false};
+}
+function quiz(){
+  if(!qs)qs={n:0,ok:0};
+  if(!q)q=newQ();
+  const w=W[q.id];
+  $('#app').innerHTML=`<div class="top"><span>已答 ${qs.n} 題</span><span>答對 ${qs.ok} 題</span></div>
+  <div class="q">${w[0]}</div><div style="text-align:center"><span class="pos">${w[1]}</span> <button class="btn alt sm" id="sp" style="margin:0 0 0 8px">發音</button></div>
+  ${q.opts.map(o=>`<button class="opt" data-o="${o}">${W[o][2]}</button>`).join('')}
+  ${q.done?`${w[3]?`<p class="ex" style="margin-top:16px">${w[3]}</p><p class="exz">${w[4]}</p>`:''}<div class="row"><button class="btn" id="nx">下一題</button></div>`:''}`;
+  $('#sp').onclick=()=>say(q.id);
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    if(q.done)return;q.done=true;const o=+b.dataset.o,ok=o===q.id;
+    qs.n++;if(ok)qs.ok++;mark(q.id,ok);quiz();
+    document.querySelectorAll('.opt').forEach(x=>{const v=+x.dataset.o;if(v===q.id)x.classList.add('ok');else if(v===o)x.classList.add('bad')});
+    say(q.id);
+  });
+  if($('#nx'))$('#nx').onclick=()=>{q=newQ();quiz()};
+}
+function stat(){
+  const t=dn(),ids=W.map((_,i)=>i);
+  const c=[0,1,2,3,4,5].map(k=>ids.filter(i=>(S.b[i]||0)===k).length);
+  const mas=c[4]+c[5],learned=W.length-c[0],pct=Math.round(mas/W.length*100);
+  const sk=(S.last===t||S.last===t-1)?S.streak:0;
+  $('#app').innerHTML=`<h2>學習進度</h2>
+  <div class="stats"><div class="stat"><b>${mas}</b><span>已熟練（共 ${W.length} 字）</span></div><div class="stat"><b>${sk}</b><span>連續學習天數</span></div>
+  <div class="stat"><b>${learned}</b><span>已看過</span></div><div class="stat"><b>${S.log[t]||0}</b><span>今天練習次數</span></div></div>
+  <p style="margin:18px 0 0">熟練度 ${pct}%</p><div class="bar"><i style="width:${pct}%"></i></div>
+  <div class="boxes"><div>未學<b>${c[0]}</b></div><div>盒1<b>${c[1]}</b></div><div>盒2<b>${c[2]}</b></div><div>盒3<b>${c[3]}</b></div><div>盒4<b>${c[4]}</b></div><div>盒5<b>${c[5]}</b></div></div>
+  <p class="hint">按「會了」或答對會升一盒，間隔拉長；不熟或答錯會退回盒1，馬上再出現。盒4以上算熟練。</p>
+  <button class="link" id="rs">清除所有紀錄</button>`;
+  $('#rs').onclick=()=>{if(confirm('確定要清除所有學習紀錄？')){S={b:{},nx:{},log:{},streak:0,last:0};sv();cur=null;stat()}};
+}
+function go(t){
+  tab=t;document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  ({card,quiz,stat})[t]();
+}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.t));
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+go('card');
+</script>
+</body>
+</html>
